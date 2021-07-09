@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015-2016, Robert J. Hansen <rjh@sixdemonbag.org>
+Copyright (c) 2015-2019, Robert J. Hansen <rjh@sixdemonbag.org>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -17,16 +17,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <string>
-#include <sys/types.h>
 #include <syslog.h>
-#include <utility>
+#include <boost/asio.hpp>
 #include <cstdint>
+#include <string>
+#include <utility>
 
-using pair64 = std::pair<uint64_t, uint64_t>;
+// Note: C++11 guarantees an unsigned long long will be at least 64 bits.
+// A compile-time assert in main.cc guarantees it will ONLY be 64 bits.
+using pair64 = std::pair<unsigned long long, unsigned long long>;
 
-enum class LogLevel
-{
+enum class LogLevel {
   INFO = LOG_INFO,
   WARN = LOG_WARNING,
   DEBUG = LOG_DEBUG,
@@ -36,9 +37,9 @@ enum class LogLevel
 };
 
 void log(const LogLevel, const std::string&&);
-void handle_client(const int32_t);
-pair64 to_pair64(std::string);
-std::string from_pair64(pair64);
+void handle_client(boost::asio::ip::tcp::iostream& stream);
+pair64 to_pair64(const std::string&);
+std::string from_pair64(const pair64&);
 bool operator<(const pair64& lhs, const pair64& rhs);
 bool operator==(const pair64& lhs, const pair64& rhs);
 bool operator>(const pair64& lhs, const pair64& rhs);
